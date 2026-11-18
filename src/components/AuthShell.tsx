@@ -1,7 +1,7 @@
 "use client";
-import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2, type LucideIcon } from "lucide-react";
-import Logo from "./Logo";
+import Link from "next/link";
+import { Wordmark } from "./Logo";
 import { useState } from "react";
 import ThemeToggle from "./ThemeToggle";
 import { Button } from "./ui/button";
@@ -10,27 +10,19 @@ import { Label } from "./ui/label";
 
 export function AuthShell({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <main className="relative flex min-h-screen items-center justify-center px-4 py-12">
-      <div className="absolute right-4 top-4">
+    <div className="flex min-h-screen flex-col">
+      <header className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4 sm:px-6">
+        <Link href="/" aria-label="smolurl home" className="rounded-md"><Wordmark /></Link>
         <ThemeToggle />
-      </div>
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 220, damping: 26 }}
-        className="surface w-full max-w-md space-y-6 p-6 shadow-xl sm:p-8"
-      >
-        <div className="space-y-1 text-center">
-          <div className="mb-3 flex items-center justify-center gap-2">
-            <Logo />
-            <span className="heading text-2xl text-primary">SmolURL</span>
-          </div>
+      </header>
+      <main className="flex flex-1 justify-center px-4 pb-16 pt-[7vh]">
+        <div className="w-full max-w-sm">
           <h1 className="heading text-2xl">{title}</h1>
-          {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+          {subtitle && <p className="mt-1.5 text-sm text-muted-foreground">{subtitle}</p>}
+          <div className="mt-7 space-y-5">{children}</div>
         </div>
-        {children}
-      </motion.div>
-    </main>
+      </main>
+    </div>
   );
 }
 
@@ -38,21 +30,20 @@ interface FieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   icon: LucideIcon;
 }
-export function Field({ label, icon: Icon, type, ...rest }: FieldProps) {
+export function Field({ label, icon: _icon, type, ...rest }: FieldProps) {
   const [show, setShow] = useState(false);
   const isPw = type === "password";
   return (
     <div className="space-y-1.5">
       <Label htmlFor={rest.name}>{label}</Label>
       <div className="relative">
-        <Icon className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input {...rest} id={rest.name} type={isPw && show ? "text" : type} className="pl-10 pr-10" />
+        <Input {...rest} id={rest.name} type={isPw && show ? "text" : type} className={isPw ? "pr-10" : undefined} />
         {isPw && (
           <button
             type="button"
             onClick={() => setShow((s) => !s)}
             aria-label={show ? "Hide password" : "Show password"}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-primary"
+            className="absolute right-1 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-md text-muted-foreground transition-colors hover:text-foreground"
           >
             {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
           </button>
@@ -74,15 +65,9 @@ export function SubmitButton({ loading, disabled, children }: { loading: boolean
 export function FormError({ message }: { message: string }) {
   if (!message) return null;
   return (
-    <motion.p
-      key={message}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1, x: [0, -6, 6, -4, 4, 0] }}
-      role="alert"
-      className="rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive"
-    >
+    <p role="alert" className="rounded-md border border-destructive/30 bg-destructive/[0.06] px-3 py-2 text-sm text-destructive">
       {message}
-    </motion.p>
+    </p>
   );
 }
 
@@ -91,7 +76,7 @@ export function GoogleButton({ remember = true, link = false, label = "Continue 
     <Button asChild variant="outline" size="lg" className="w-full">
       {/* a full-page navigation: the OAuth flow redirects through Google */}
       <a href={link ? "/api/auth/google?link=1" : `/api/auth/google${remember ? "" : "?remember=0"}`}>
-        <svg viewBox="0 0 24 24" className="!size-5" aria-hidden>
+        <svg viewBox="0 0 24 24" aria-hidden>
           <path fill="#4285F4" d="M22.5 12.27c0-.79-.07-1.54-.2-2.27H12v4.3h5.9a5.04 5.04 0 0 1-2.19 3.31v2.75h3.54c2.07-1.9 3.25-4.7 3.25-8.09Z" />
           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.54-2.75c-.98.66-2.24 1.05-3.74 1.05-2.87 0-5.3-1.94-6.17-4.55H2.18v2.84A11 11 0 0 0 12 23Z" />
           <path fill="#FBBC05" d="M5.83 13.09a6.6 6.6 0 0 1 0-4.18V6.07H2.18a11 11 0 0 0 0 9.86l3.65-2.84Z" />
@@ -105,7 +90,7 @@ export function GoogleButton({ remember = true, link = false, label = "Continue 
 
 export function OrDivider() {
   return (
-    <div className="flex items-center gap-3 text-xs uppercaser text-muted-foreground">
+    <div className="flex items-center gap-3 text-xs text-muted-foreground">
       <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
     </div>
   );
@@ -117,6 +102,6 @@ export const AUTH_ERRORS: Record<string, string> = {
   google_failed: "Google sign-in didn't work. Please try again.",
   google_unverified: "Your Google email isn't verified, so we can't sign you in with it.",
   google_conflict: "This email is already linked to a different Google account.",
-  google_taken: "That Google account is already linked to another SmolURL account.",
+  google_taken: "That Google account is already linked to another smolurl account.",
   google_email_mismatch: "That Google account uses a different email than this account. Sign in with the Google account that has your email.",
 };

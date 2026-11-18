@@ -1,7 +1,7 @@
 # SmolURL
 
 Short links with names you choose. Shorten any URL to `/r/<name>`, share it, and see how many people clicked and where they came from.
-Built with **Next.js (App Router) + TypeScript**, on the same foundation as [ToDo Next](https://github.com/nandhu-44/todo-next).
+Built with **Next.js (App Router) + TypeScript**. Accounts, API keys and security share their foundation with [ToDo Next](https://github.com/nandhu-44/todo-next); the product and its design are SmolURL's own.
 
 ## Features
 - **Custom or random short names.** `/r/launch`, or a 7-character random name without look-alike characters (no `0/O`, `1/l/I`).
@@ -13,7 +13,7 @@ Built with **Next.js (App Router) + TypeScript**, on the same foundation as [ToD
 - **Edit anything later**: destination, short name, title, status and expiry.
 - **Delete with undo.** A deleted link and its stats can be restored for two minutes.
 - Search, filter (active / paused / expired) and sort (newest, most clicks, recently clicked…), remembered per browser. Keyboard shortcuts: `N` new link, `/` search.
-- Light / dark theme, six colour themes, a custom theme, fonts and corner roundness (*Settings → Appearance*).
+- Light, dark or system theme. Without JavaScript the page follows the system setting.
 
 ## Run it
 ```bash
@@ -23,6 +23,15 @@ npm run dev
 ```
 With no `MONGO_URI`, data lives in `./data/db.json` (zero setup). Set `MONGO_URI` to use MongoDB.
 With no SMTP settings, password-reset links are printed to the server console (and shown on the page in dev).
+
+## Design
+- **Type:** the Red Hat superfamily, self-hosted: *Red Hat Display* for headings, *Red Hat Text* for the interface and *Red Hat Mono* only for URLs, short names and code.
+- **Colour:** cool neutrals and one accent, link blue (`#3047C8` light, `#93A4FF` dark), used for links and primary actions. Tokens live in `src/app/globals.css`;
+  `tests/palette.test.ts` checks that every text/background pair meets WCAG AA in both modes.
+- **Layout:** one column under a top bar; links are rows in a single list rather than cards. Radii follow hierarchy (controls 6px, rows and menus 8px, panels 10px, dialogs 12px).
+- **Motion:** one authored moment on the landing page (the long address struck through, the short one revealed); elsewhere only feedback to actions, under 300ms with an ease-out curve.
+  Reduced motion is respected.
+- Browser surfaces are themed too: text selection, caret, focus rings, scrollbars, `accent-color` and `color-scheme`.
 
 ## Short links
 - A link is `https://<your-site>/r/<name>`. Opening it answers with a `307` redirect straight away; the click is recorded after the response is sent, so the database never slows the redirect down.
@@ -56,13 +65,22 @@ Docs live at `/docs` and the OpenAPI 3.1 spec at `/api/v1/openapi.json`. Default
 5 keys and 1,000 links per account. Responses carry `X-RateLimit-*` and `X-Quota-*` headers; going over returns `429` with `Retry-After`.
 
 ## Tests
-- `npm test` runs the unit checks: link validation, slugs and click detection (`tests/links.test.ts`), theme contrast (`tests/appearance.test.ts`) and the CAPTCHA (`tests/captcha.test.ts`).
+- `npm test` runs the unit checks: link validation, slugs and click detection (`tests/links.test.ts`), palette contrast (`tests/palette.test.ts`) and the CAPTCHA (`tests/captcha.test.ts`).
 - `tests/api.integration.js` exercises the API, redirects, click counting, limits and quotas against a running server; its header shows how to start one.
 
 ## Deploying
 Works on Vercel or any Node host. Set `AUTH_SECRET` and `MONGO_URI` (for example a free MongoDB Atlas cluster).
 For the fastest redirects, put the function region next to the database and use a `mongodb://` connection string rather than `mongodb+srv://`.
 `GET /api/health` is a cheap public check; with `HEALTH_TOKEN` set, `GET /api/health?deep=1` reports database latency.
+
+### Cloudflare Workers
+Possible with the [OpenNext Cloudflare adapter](https://opennext.js.org/cloudflare) (it supports Next.js 16 and `after()`), but not a drop-in move:
+- **Plan:** the Free plan allows 10 ms of CPU per request, which bcrypt password checks and server rendering exceed. Use Workers Paid.
+- **Database:** the MongoDB driver works over Workers TCP sockets (`nodejs_compat`), but a Worker can't reuse a connection across requests, so every request
+  (including every redirect) opens a new one (~300 ms). The cached client in `src/lib/db.ts` would also need to become per-request. A better fit is a
+  Cloudflare D1 (SQLite) implementation of the `Collection` interface in `src/lib/db.ts`, with KV in front of `/r/<slug>` lookups.
+- **Files:** there is no file system, so the `data/db.json` fallback is for local development only.
+- **Rate limits** are kept in memory per isolate, so they become best-effort, as on Vercel.
 
 ## License
 [MIT](LICENSE)

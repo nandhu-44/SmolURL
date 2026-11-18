@@ -1,21 +1,15 @@
-"use client";
-import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export function Section({ icon: Icon, title, description, children, danger }: { icon: LucideIcon; title: string; description?: string; children: React.ReactNode; danger?: boolean }) {
+/** One settings group: what it is on the left, its controls on the right (stacked on phones). */
+export function Section({ title, description, children, danger }: { icon?: LucideIcon; title: string; description?: string; children: React.ReactNode; danger?: boolean }) {
   return (
-    <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className={`surface p-5 ${danger ? "border-destructive/40" : ""}`}>
-      <div className="mb-4 flex items-start gap-3">
-        <span className={`grid size-9 shrink-0 place-items-center rounded-xl ${danger ? "bg-destructive/12 text-destructive" : "bg-primary/15 text-primary"}`}>
-          <Icon className="size-5" />
-        </span>
-        <div>
-          <h2 className="heading text-lg">{title}</h2>
-          {description && <p className="text-sm text-muted-foreground">{description}</p>}
-        </div>
+    <section className="grid gap-x-10 gap-y-4 border-t border-border py-8 first:border-t-0 first:pt-2 md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">
+      <div>
+        <h2 className={cn("heading text-[15px]", danger && "text-destructive")}>{title}</h2>
+        {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
       </div>
-      {children}
-    </motion.section>
+      <div className="min-w-0">{children}</div>
+    </section>
   );
 }
-

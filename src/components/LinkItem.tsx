@@ -1,12 +1,10 @@
 "use client";
-import { motion } from "framer-motion";
-import { BarChart3, Check, Copy, ExternalLink, MoreHorizontal, Pause, Pencil, Play, QrCode, Trash2 } from "lucide-react";
+import { BarChart3, Check, Copy, CornerDownRight, ExternalLink, MoreHorizontal, Pause, Pencil, Play, QrCode, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { copyText } from "@/lib/client";
+import { copyText, plural, when } from "@/lib/client";
 import { notify } from "@/lib/notify";
 import type { Link } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { Sparkline } from "./charts";
 import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Tip } from "./ui/tooltip";
@@ -18,9 +16,10 @@ interface Props {
   /** full short URL (empty until mounted) */
   shortUrl: string;
   state: LinkStateLabel;
-  /** "expires in 3 days" etc., computed after mount */
+  /** "Expires in 3 days" etc., computed after mount */
   expiryNote: string | null;
-  spark: number[];
+  /** the clock, once mounted (null on the server) */
+  now: number | null;
   highlight: boolean;
   onEdit: () => void;
   onToggle: () => void;
@@ -29,7 +28,7 @@ interface Props {
   onDelete: () => void;
 }
 
-const host = (url: string) => {
+const destination = (url: string) => {
   try {
     const u = new URL(url);
     return u.hostname.replace(/^www\./, "") + (u.pathname === "/" ? "" : u.pathname) + u.search;
@@ -38,9 +37,10 @@ const host = (url: string) => {
   }
 };
 
-export default function LinkItem({ link, shortUrl, state, expiryNote, spark, highlight, onEdit, onToggle, onStats, onQr, onDelete }: Props) {
+/** One link in the list: what it is and where it goes on the left, its clicks and actions on the right. */
+export default function LinkItem({ link, shortUrl, state, expiryNote, now, highlight, onEdit, onToggle, onStats, onQr, onDelete }: Props) {
   const [copied, setCopied] = useState(false);
-  const week = spark.slice(-7).reduce((a, b) => a + b, 0);
+  const live = state === "active";
 
   async function copy() {
     if (await copyText(shortUrl)) {
@@ -50,62 +50,53 @@ export default function LinkItem({ link, shortUrl, state, expiryNote, spark, hig
   }
 
   return (
-    <motion.li
-      layout
-      initial={{ opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.97 }}
-      className={cn("surface p-4 transition-shadow", highlight && "ring-2 ring-primary ring-offset-2 ring-offset-background", state !== "active" && "bg-card/60")}
-    >
-      <div className="flex items-start gap-3">
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className={cn("heading truncate text-lg leading-tight", state !== "active" && "text-muted-foreground")}>{link.title}</h3>
-            {state === "disabled" && <span className="flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground"><Pause className="size-3" /> Paused</span>}
-            {state === "expired" && <span className="rounded-full bg-destructive/12 px-2 py-0.5 text-[11px] font-medium text-destructive">Expired</span>}
-            {state === "active" && expiryNote && <span className="rounded-full bg-primary/12 px-2 py-0.5 text-[11px] font-medium text-primary">{expiryNote}</span>}
-          </div>
+    <li className={cn("grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-3 px-4 py-3.5 transition-colors duration-700 sm:grid-cols-[minmax(0,1fr)_7.5rem_auto]", highlight && "bg-primary/[0.06]")}>
+      <div className="min-w-0">
+        <div className="flex min-w-0 items-center gap-2">
+          <h3 className={cn("truncate text-[15px] font-medium", !live && "text-muted-foreground")}>{link.title}</h3>
+          {state === "disabled" && <span className="shrink-0 rounded-[4px] bg-muted px-1.5 py-px text-xs font-medium text-muted-foreground">Paused</span>}
+          {state === "expired" && <span className="shrink-0 rounded-[4px] bg-destructive/10 px-1.5 py-px text-xs font-medium text-destructive">Expired</span>}
+          {live && expiryNote && <span className="shrink-0 text-xs text-muted-foreground">{expiryNote}</span>}
+        </div>
+        <div className="mt-0.5 flex min-w-0 items-center gap-2 text-sm">
           <button
             onClick={copy}
-            className={cn("mt-1 max-w-full truncate font-mono text-sm outline-none hover:underline focus-visible:underline", state === "active" ? "text-primary" : "text-muted-foreground line-through decoration-1")}
+            disabled={!shortUrl}
+            className={cn("mono shrink-0 rounded-sm font-medium hover:underline", live ? "text-primary" : "text-muted-foreground line-through decoration-1")}
             aria-label={`Copy short link /r/${link.slug}`}
           >
             /r/{link.slug}
           </button>
-          <a href={link.url} target="_blank" rel="noopener noreferrer" className="mt-0.5 flex min-w-0 items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
-            <span aria-hidden>→</span>
-            <span className="truncate">{host(link.url)}</span>
-          </a>
+          <CornerDownRight className="size-3.5 shrink-0 text-muted-foreground/70" aria-label="goes to" />
+          <a href={link.url} target="_blank" rel="noopener noreferrer" className="min-w-0 truncate text-muted-foreground hover:text-foreground hover:underline">{destination(link.url)}</a>
         </div>
-
-        <button onClick={onStats} className="hidden shrink-0 flex-col items-end gap-1 rounded-xl px-2 py-1 text-right outline-none transition hover:bg-muted focus-visible:ring-2 focus-visible:ring-primary sm:flex" aria-label={`${link.clicks} clicks, ${week} in the last 7 days. Open stats`}>
-          <span className="heading text-xl leading-none">{link.clicks.toLocaleString("en-US")}</span>
-          <span className="text-[11px] text-muted-foreground">{link.clicks === 1 ? "click" : "clicks"} · {week} this week</span>
-          <Sparkline values={spark} />
-        </button>
       </div>
 
-      <div className="mt-3 flex items-center gap-1.5 border-t border-border pt-3">
-        <Button size="icon-sm" variant={copied ? "default" : "outline"} className="w-auto gap-1.5 px-3 text-sm" onClick={copy} disabled={!shortUrl}>
-          {copied ? <><Check /> Copied</> : <><Copy /> Copy</>}
-        </Button>
-        <Tip label="QR code"><Button size="icon-sm" variant="ghost" onClick={onQr} aria-label="QR code"><QrCode /></Button></Tip>
-        <Tip label="Stats"><Button size="icon-sm" variant="ghost" onClick={onStats} aria-label="Stats"><BarChart3 /></Button></Tip>
-        <Tip label="Edit"><Button size="icon-sm" variant="ghost" onClick={onEdit} aria-label="Edit"><Pencil /></Button></Tip>
-        <span className="ml-auto text-xs text-muted-foreground sm:hidden">{link.clicks.toLocaleString("en-US")} {link.clicks === 1 ? "click" : "clicks"}</span>
+      <button onClick={onStats} className="col-start-1 row-start-2 justify-self-start rounded-md text-left text-sm sm:col-start-auto sm:row-start-auto sm:justify-self-end sm:text-right" aria-label={`${plural(link.clicks, "click")}. Open stats`}>
+        <span className="font-medium tabular-nums">{plural(link.clicks, "click")}</span>
+        <span className="ml-2 text-xs text-muted-foreground sm:ml-0 sm:block">{link.lastClickedAt ? (now !== null ? `clicked ${when(link.lastClickedAt, now)}` : " ") : "no clicks yet"}</span>
+      </button>
+
+      <div className="row-span-2 flex items-center gap-0.5 self-start sm:row-span-1 sm:self-center">
+        <Tip label={copied ? "Copied" : "Copy link"}>
+          <Button size="icon-sm" variant="ghost" onClick={copy} disabled={!shortUrl} aria-label="Copy link">{copied ? <Check className="text-success" /> : <Copy />}</Button>
+        </Tip>
+        <Tip label="Stats"><Button size="icon-sm" variant="ghost" onClick={onStats} aria-label="Stats" className="hidden sm:inline-flex"><BarChart3 /></Button></Tip>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size="icon-sm" variant="ghost" aria-label="More actions" className="sm:ml-auto"><MoreHorizontal /></Button>
+            <Button size="icon-sm" variant="ghost" aria-label="More actions"><MoreHorizontal /></Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onSelect={onEdit}><Pencil /> Edit</DropdownMenuItem>
-            <DropdownMenuItem onSelect={onToggle}>{link.enabled ? <><Pause /> Pause link</> : <><Play /> Turn link on</>}</DropdownMenuItem>
+            <DropdownMenuItem onSelect={onQr}><QrCode /> QR code</DropdownMenuItem>
+            <DropdownMenuItem onSelect={onStats}><BarChart3 /> Stats</DropdownMenuItem>
+            <DropdownMenuItem onSelect={onToggle}>{link.enabled ? <><Pause /> Pause</> : <><Play /> Resume</>}</DropdownMenuItem>
             <DropdownMenuItem asChild><a href={shortUrl || `/r/${link.slug}`} target="_blank" rel="noopener noreferrer"><ExternalLink /> Open short link</a></DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={onDelete} className="text-destructive"><Trash2 /> Delete</DropdownMenuItem>
+            <DropdownMenuItem onSelect={onDelete} className="text-destructive [&_svg]:!text-destructive"><Trash2 /> Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </motion.li>
+    </li>
   );
 }

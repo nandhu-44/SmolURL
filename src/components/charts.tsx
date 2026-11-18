@@ -11,21 +11,6 @@ function barPath(x: number, y: number, w: number, h: number) {
   return `M${x},${y + h}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h}Z`;
 }
 
-/** Tiny decorative trend of clicks per day; the numbers it shows are always stated in text next to it. */
-export function Sparkline({ values, className }: { values: number[]; className?: string }) {
-  const max = Math.max(1, ...values);
-  const W = 64, H = 20, gap = 1.5;
-  const w = (W - gap * (values.length - 1)) / values.length;
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} className={cn("h-5 w-16", className)} aria-hidden preserveAspectRatio="none">
-      {values.map((v, i) => {
-        const h = v ? Math.max(2, (v / max) * H) : 1;
-        return <rect key={i} x={i * (w + gap)} y={H - h} width={w} height={h} rx={Math.min(1.5, w / 2)} className={v ? "fill-primary" : "fill-muted-foreground/25"} />;
-      })}
-    </svg>
-  );
-}
-
 /** Clicks per day: one series, so one colour and no legend. Every bar has a hover/focus tooltip; a table backs it for screen readers. */
 export function ClicksChart({ days, height = 160 }: { days: DayCount[]; height?: number }) {
   const [hover, setHover] = useState<number | null>(null);
@@ -63,11 +48,11 @@ export function ClicksChart({ days, height = 160 }: { days: DayCount[]; height?:
       <div className="pointer-events-none absolute left-0 top-0 text-[11px] text-muted-foreground">{max.toLocaleString("en-US")} max</div>
       {tip && hover !== null && (
         <div
-          className="pointer-events-none absolute top-0 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg border border-border bg-popover px-2.5 py-1.5 text-xs shadow-lg"
+          className="pointer-events-none absolute top-0 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs text-background"
           style={{ left: `${Math.min(92, Math.max(8, ((hover + 0.5) / days.length) * 100))}%` }}
         >
-          <span className="font-medium text-foreground">{tip.count.toLocaleString()} {tip.count === 1 ? "click" : "clicks"}</span>
-          <span className="text-muted-foreground"> · {shortDay(tip.day)}</span>
+          <span className="font-medium">{tip.count.toLocaleString("en-US")} {tip.count === 1 ? "click" : "clicks"}</span>{" "}
+          <span className="opacity-70">on {shortDay(tip.day)}</span>
         </div>
       )}
       {/* keyboard + screen reader access to every value */}

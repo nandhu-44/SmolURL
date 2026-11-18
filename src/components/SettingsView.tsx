@@ -1,7 +1,6 @@
 "use client";
-import { ArrowLeft, Check, Copy, Download, KeyRound, Loader2, Lock, ShieldCheck, ShieldOff, Trash2, User } from "lucide-react";
-import Logo from "./Logo";
-import Link, { useLinkStatus } from "next/link";
+import { Check, Copy, Download, KeyRound, Loader2, Lock, ShieldCheck, ShieldOff, Trash2, User } from "lucide-react";
+import AppHeader from "./AppHeader";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { notify } from "@/lib/notify";
@@ -9,26 +8,12 @@ import type { PublicUser } from "@/lib/types";
 import { AUTH_ERRORS, GoogleButton } from "./AuthShell";
 import { OtpInput } from "./OtpInput";
 import ApiKeysSettings from "./ApiKeysSettings";
-import AppearanceSettings from "./AppearanceSettings";
 import PasskeySettings from "./PasskeySettings";
-import { ProgressBar } from "./NavProgress";
 import { Section } from "./SettingsSection";
-import ThemeToggle from "./ThemeToggle";
 import { Button } from "./ui/button";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, Dialog, DialogContent } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-
-/** "Back to links" label that shows a spinner and a progress bar while the next page loads. */
-function BackLabel() {
-  const { pending } = useLinkStatus();
-  return (
-    <>
-      {pending ? <Loader2 className="animate-spin" /> : <ArrowLeft />} Back to links
-      {pending && <ProgressBar />}
-    </>
-  );
-}
 
 export default function SettingsView({ initial, passkeyCount: initialPasskeys, googleEnabled, error, linked }: { initial: PublicUser; passkeyCount: number; googleEnabled: boolean; error?: string; linked?: boolean }) {
   const [user, setUser] = useState(initial);
@@ -42,32 +27,22 @@ export default function SettingsView({ initial, passkeyCount: initialPasskeys, g
   }, [linked, error]);
 
   return (
-    <main className="mx-auto max-w-2xl px-3 pb-24 pt-5 sm:px-6">
-      <header className="flex items-center justify-between">
-        <Button asChild variant="ghost">
-          <Link href="/"><BackLabel /></Link>
-        </Button>
-        <ThemeToggle />
-      </header>
-      <div className="mt-4 flex items-center gap-3">
-        <Logo className="size-9" />
-        <div>
-          <h1 className="heading text-2xl">Account settings</h1>
-          <p className="text-sm text-muted-foreground">{user.email}</p>
-        </div>
-      </div>
-
-      <div className="mt-6 space-y-4">
+    <>
+      <AppHeader user={user} />
+      <main className="mx-auto max-w-5xl px-4 pb-24 pt-8 sm:px-6">
+        <h1 className="heading text-2xl">Settings</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Your account, sign-in methods and API keys.</p>
+        <div className="mt-6">
         <ProfileSection user={user} onChange={setUser} />
         <PasswordSection user={user} onChange={setUser} />
         <TwoFactorSection user={user} onChange={setUser} />
         <PasskeySettings onCount={setPasskeyCount} />
         <GoogleSection user={user} passkeyCount={passkeyCount} googleEnabled={googleEnabled} onChange={setUser} />
-        <AppearanceSettings initial={user.appearance} />
         <ApiKeysSettings />
         <DeleteSection user={user} onDeleted={() => window.location.assign("/signup")} />
-      </div>
-    </main>
+        </div>
+      </main>
+    </>
   );
 }
 

@@ -5,13 +5,8 @@ const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
-      // corner radius follows the user's setting (--radius, default 12px)
-      borderRadius: {
-        md: "max(0px, calc(var(--radius) - 6px))",
-        lg: "max(0px, calc(var(--radius) - 2px))",
-        xl: "var(--radius)",
-        "2xl": "calc(var(--radius) * 1.333)",
-      },
+      // radius follows hierarchy: controls 6px, menus and rows 8px, panels 10px, dialogs 12px
+      borderRadius: { md: "6px", lg: "8px", xl: "10px", "2xl": "12px" },
       colors: {
         background: "hsl(var(--background) / <alpha-value>)",
         foreground: "hsl(var(--foreground) / <alpha-value>)",
@@ -21,25 +16,19 @@ const config: Config = {
         border: "hsl(var(--border) / <alpha-value>)",
         primary: { DEFAULT: "hsl(var(--primary) / <alpha-value>)", foreground: "hsl(var(--primary-foreground) / <alpha-value>)" },
         destructive: { DEFAULT: "hsl(var(--destructive) / <alpha-value>)", foreground: "hsl(0 0% 100%)" },
-        prio: { high: "hsl(var(--p-high) / <alpha-value>)", medium: "hsl(var(--p-medium) / <alpha-value>)", low: "hsl(var(--p-low) / <alpha-value>)" },
+        success: "hsl(var(--success) / <alpha-value>)",
       },
       fontFamily: {
-        supercell: ["var(--font-heading)"],
-        poppins: ["var(--font-body)"],
+        sans: ["'Red Hat Text'", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["'Red Hat Display'", "'Red Hat Text'", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["'Red Hat Mono'", "ui-monospace", "SFMono-Regular", "monospace"],
       },
+      transitionTimingFunction: { out: "var(--ease-out)" },
       keyframes: {
-        float: {
-          "0%,100%": { transform: "translate3d(0,0,0) scale(1)" },
-          "50%": { transform: "translate3d(40px,-50px,0) scale(1.12)" },
-        },
         "nav-progress": { "0%": { transform: "translateX(-100%)" }, "100%": { transform: "translateX(300%)" } },
-        "soft-pulse": { "0%,100%": { opacity: "1" }, "50%": { opacity: "0.7" } },
+        "soft-pulse": { "0%,100%": { opacity: "1" }, "50%": { opacity: "0.6" } },
       },
-      animation: {
-        float: "float 18s ease-in-out infinite",
-        "float-slow": "float 26s ease-in-out infinite reverse",
-        "soft-pulse": "soft-pulse 4s ease-in-out infinite",
-      },
+      animation: { "soft-pulse": "soft-pulse 1.6s ease-in-out infinite" },
     },
   },
   plugins: [require("tailwindcss-animate")],

@@ -2,8 +2,7 @@
 import { Globe, MousePointerClick } from "lucide-react";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
-import { useNow } from "@/lib/client";
-import { timeAgo } from "@/lib/time";
+import { useNow, when } from "@/lib/client";
 import type { Link, LinkStats } from "@/lib/types";
 import { ClicksChart } from "./charts";
 import { Dialog, DialogContent } from "./ui/dialog";
@@ -33,39 +32,39 @@ export default function LinkStatsDialog({ link, onClose }: { link: Link | null; 
 
   return (
     <Dialog open={!!link} onOpenChange={(o) => !o && (onClose(), setStats(null), setRange("30"))}>
-      <DialogContent title={link ? `Stats · ${link.title}` : "Stats"} description="Clicks per day and referring sites" className="max-w-xl">
+      <DialogContent title={link ? <span>Stats for <span className="mono font-medium text-primary">/r/{link.slug}</span></span> : "Stats"} description="Clicks per day and referring sites" className="max-w-xl">
         <div className="space-y-5">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div className="flex gap-6">
               <div>
-                <p className="text-xs text-muted-foreground">All-time clicks</p>
-                <p className="heading text-3xl">{(stats?.total ?? link?.clicks ?? 0).toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground">All time</p>
+                <p className="mt-0.5 text-2xl font-semibold tabular-nums">{(stats?.total ?? link?.clicks ?? 0).toLocaleString("en-US")}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Last {range} days</p>
-                <p className="heading text-3xl">{stats ? inRange.toLocaleString() : "–"}</p>
+                <p className="text-sm text-muted-foreground">Last {range} days</p>
+                <p className="mt-0.5 text-2xl font-semibold tabular-nums">{stats ? inRange.toLocaleString("en-US") : "–"}</p>
               </div>
             </div>
             <SegmentedControl label="Time range" value={range} onChange={setRange} options={[{ value: "7", label: "7d" }, { value: "30", label: "30d" }, { value: "90", label: "90d" }]} />
           </div>
 
           {error ? (
-            <p className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">{error}</p>
+            <p className="rounded-md border border-destructive/30 bg-destructive/[0.06] p-3 text-sm text-destructive">{error}</p>
           ) : !stats ? (
-            <div className="h-40 animate-soft-pulse rounded-xl bg-muted" aria-label="Loading stats" />
+            <div className="h-40 animate-soft-pulse rounded-lg bg-muted" aria-label="Loading stats" />
           ) : (
             <ClicksChart days={stats.days} />
           )}
 
           <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <MousePointerClick className="size-3.5" />
-            {link?.lastClickedAt && now ? `Last clicked ${timeAgo(link.lastClickedAt)}` : "Not clicked yet"} · days are in UTC · link previews and bots aren&apos;t counted
+            {link?.lastClickedAt && now ? `Last clicked ${when(link.lastClickedAt, now)}.` : "Not clicked yet."} Days are UTC. Bots and link previews aren&apos;t counted.
           </p>
 
           <section>
-            <h3 className="heading mb-2 text-base">Top sources</h3>
+            <h3 className="heading mb-3 text-sm">Where clicks came from</h3>
             {!stats ? null : stats.referrers.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No clicks yet. Share the link and sources will show up here.</p>
+              <p className="text-sm text-muted-foreground">No clicks yet. Sites that send visitors will appear here.</p>
             ) : (
               <ul className="space-y-2">
                 {stats.referrers.map((r) => (
@@ -75,9 +74,9 @@ export default function LinkStatsDialog({ link, onClose }: { link: Link | null; 
                         <Globe className="size-3.5 shrink-0 text-muted-foreground" />
                         <span className="truncate">{r.source === "direct" ? "Direct, apps & QR scans" : r.source}</span>
                       </span>
-                      <span className="tabular-nums text-muted-foreground">{r.count.toLocaleString()}</span>
+                      <span className="tabular-nums text-muted-foreground">{r.count.toLocaleString("en-US")}</span>
                     </div>
-                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
+                    <div className="mt-1 h-1 overflow-hidden rounded-full bg-muted">
                       <div className="h-full rounded-full bg-primary" style={{ width: `${Math.max(2, (r.count / topRef) * 100)}%` }} />
                     </div>
                   </li>

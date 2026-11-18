@@ -62,7 +62,7 @@ export default function PasskeySettings({ onCount }: { onCount: (n: number) => v
           {list.length === 0 && <p className="rounded-xl bg-muted/50 px-4 py-5 text-center text-sm text-muted-foreground">No passkeys yet. Add one to sign in without typing a password.</p>}
           {list.map((p) => (
             <div key={p.id} className="flex items-center gap-3 rounded-xl border border-border p-3">
-              <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary/12 text-primary">{p.deviceType === "multiDevice" ? <Cloud className="size-4" /> : <Smartphone className="size-4" />}</span>
+              <span className="grid size-8 shrink-0 place-items-center rounded-md bg-muted text-muted-foreground">{p.deviceType === "multiDevice" ? <Cloud className="size-4" /> : <Smartphone className="size-4" />}</span>
               <div className="min-w-0 flex-1">
                 <p className="heading truncate text-base">{p.name}</p>
                 <p className="text-xs text-muted-foreground">
@@ -94,7 +94,7 @@ export default function PasskeySettings({ onCount }: { onCount: (n: number) => v
             </>
           }
         >
-          <p className="heading text-lg">&ldquo;{removing?.name}&rdquo; will stop working here.</p>
+          <p className="text-sm text-muted-foreground">&ldquo;{removing?.name}&rdquo; will no longer sign you in.</p>
           <p className="mt-1 text-sm text-muted-foreground">You can delete the passkey from your device or password manager too; it&apos;s no longer accepted either way.</p>
         </AlertDialogContent>
       </AlertDialog>

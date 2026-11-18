@@ -1,89 +1,92 @@
-import { BarChart3, BookOpen, CalendarClock, Code, Fingerprint, PenLine, QrCode } from "lucide-react";
 import Link from "next/link";
-import Logo from "./Logo";
-import ThemeToggle from "./ThemeToggle";
+import AppHeader from "./AppHeader";
+import { Wordmark } from "./Logo";
 import { Button } from "./ui/button";
 
-const FEATURES = [
-  { icon: PenLine, title: "Names you choose", text: "Turn a long address into /r/launch, or let SmolURL pick a short random one." },
-  { icon: BarChart3, title: "Click stats", text: "Clicks per day and the sites they came from. Link previews and bots aren't counted." },
-  { icon: QrCode, title: "QR codes", text: "Download a QR code for any link as PNG or SVG, ready for print." },
-  { icon: CalendarClock, title: "Pause or expire", text: "Turn a link off without losing it, or have it stop working after a date." },
-  { icon: BookOpen, title: "API", text: "Create and track links from scripts with scoped API keys and an OpenAPI spec." },
-  { icon: Fingerprint, title: "Secure sign-in", text: "Passkeys, two-step verification and Google sign-in, with your own theme." },
+const LONG = "example.com/blog/2026/introducing-the-spring-collection?utm_source=newsletter&utm_medium=email&utm_campaign=launch";
+
+const POINTS = [
+  { title: "Choose the name", text: "Make it /r/spring, /r/menu or /r/rsvp. Leave it blank and you get seven random characters that are easy to read aloud." },
+  { title: "See what works", text: "Clicks per day for each link and the sites that sent them. Bots and chat-app link previews aren't counted." },
+  { title: "Print it", text: "Every link has a QR code you can download as PNG or SVG for posters, menus and slides." },
+  { title: "Pause or expire", text: "Turn a link off for a while without losing its stats, or set the day it stops working." },
+  { title: "Use the API", text: "Create, change and track links from scripts with scoped keys, rate limits and an OpenAPI spec." },
 ];
+
+const CURL = `curl -X POST https://your-site/api/v1/links \\
+  -H "Authorization: Bearer $SMOL_KEY" \\
+  -d '{"url":"https://example.com/blog/spring","slug":"spring"}'`;
+
+const RESPONSE = `{
+  "data": {
+    "slug": "spring",
+    "shortUrl": "https://your-site/r/spring",
+    "clicks": 0
+  }
+}`;
 
 /** What signed-out visitors see at /. Static: no clock, no data. */
 export default function Landing() {
   return (
-    <main className="mx-auto max-w-5xl px-4 pb-16 pt-5 sm:px-6">
-      <header className="flex items-center justify-between gap-3">
-        <Link href="/" className="flex items-center gap-2"><Logo className="size-9" /><span className="heading text-2xl text-primary">SmolURL</span></Link>
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <Button asChild variant="ghost" className="hidden sm:inline-flex"><Link href="/signin">Sign in</Link></Button>
-          <Button asChild><Link href="/signup">Get started</Link></Button>
-        </div>
-      </header>
-
-      <section className="grid items-center gap-10 py-14 sm:py-20 md:grid-cols-[1.1fr_1fr]">
-        <div>
-          <h1 className="heading text-4xl leading-tight sm:text-5xl">Short links with names you&nbsp;choose.</h1>
-          <p className="mt-4 max-w-md text-lg text-muted-foreground">
-            Shorten any URL, share it anywhere, and see how many people clicked and where they came from.
+    <>
+      <AppHeader user={null} />
+      <main>
+        <section className="mx-auto max-w-5xl px-4 pb-20 pt-16 sm:px-6 sm:pt-24">
+          <h1 className="max-w-2xl text-[2.6rem] font-semibold leading-[1.05] tracking-[-0.035em] sm:text-[3.5rem]">Short links you name yourself.</h1>
+          <p className="mt-5 max-w-xl text-lg text-muted-foreground">
+            Paste a long address, pick a short name, and see how many people opened it and where they came from.
           </p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Button asChild size="lg"><Link href="/signup">Create a free account</Link></Button>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Button asChild size="lg"><Link href="/signup">Create an account</Link></Button>
             <Button asChild size="lg" variant="outline"><Link href="/signin">Sign in</Link></Button>
           </div>
-        </div>
 
-        {/* an illustration of a link card; not live data */}
-        <div aria-hidden className="surface rotate-1 p-4 shadow-lg">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="heading text-lg">Spring launch post</p>
-              <p className="font-mono text-sm text-primary">/r/launch</p>
-              <p className="truncate text-xs text-muted-foreground">→ example.com/blog/2026/introducing-our-spring-collection</p>
+          {/* the long address, struck through, and the short one it becomes */}
+          <figure className="mt-16 border-t border-border pt-10" aria-label={`${LONG} becomes /r/spring`}>
+            <p className="demo-long mono max-w-3xl break-all text-sm leading-relaxed text-foreground sm:text-base">{LONG}</p>
+            <p className="demo-short mono mt-4 text-[2.75rem] font-medium leading-none tracking-[-0.02em] text-primary sm:text-[4.5rem]">/r/spring</p>
+          </figure>
+        </section>
+
+        <section aria-labelledby="what" className="border-t border-border bg-card">
+          <div className="mx-auto grid max-w-5xl gap-x-16 gap-y-8 px-4 py-16 sm:px-6 md:grid-cols-[minmax(0,14rem)_minmax(0,1fr)]">
+            <h2 id="what" className="heading text-xl">What you get</h2>
+            <dl className="divide-y divide-border border-y border-border">
+              {POINTS.map((p) => (
+                <div key={p.title} className="grid gap-1 py-4 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-6">
+                  <dt className="font-medium">{p.title}</dt>
+                  <dd className="max-w-prose text-muted-foreground">{p.text}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </section>
+
+        <section aria-labelledby="api" className="border-t border-border">
+          <div className="mx-auto grid max-w-5xl gap-x-16 gap-y-6 px-4 py-16 sm:px-6 md:grid-cols-[minmax(0,14rem)_minmax(0,1fr)]">
+            <div>
+              <h2 id="api" className="heading text-xl">From a script</h2>
+              <p className="mt-2 text-sm text-muted-foreground">Create a key in Settings, then shorten links from anywhere.</p>
+              <Link href="/docs" className="mt-3 inline-block text-sm font-medium text-primary hover:underline">Read the API docs</Link>
             </div>
-            <div className="text-right">
-              <p className="heading text-2xl leading-none">1,248</p>
-              <p className="text-[11px] text-muted-foreground">clicks</p>
+            <div className="min-w-0 overflow-hidden rounded-xl border border-border bg-card">
+              <pre className="mono overflow-x-auto border-b border-border p-4 text-[13px] leading-relaxed">{CURL}</pre>
+              <pre className="mono overflow-x-auto p-4 text-[13px] leading-relaxed text-muted-foreground">{RESPONSE}</pre>
             </div>
           </div>
-          <div className="mt-4 flex h-20 items-end gap-1.5">
-            {[18, 26, 22, 40, 34, 52, 47, 61, 58, 72, 66, 84, 79, 95].map((h, i) => (
-              <div key={i} className="flex-1 rounded-t bg-primary" style={{ height: `${h}%`, opacity: 0.45 + i * 0.04 }} />
-            ))}
-          </div>
-          <div className="mt-3 flex gap-2 border-t border-border pt-3">
-            <span className="rounded-lg bg-primary px-3 py-1.5 text-sm text-primary-foreground">Copy</span>
-            <span className="rounded-lg border border-border px-3 py-1.5 text-sm">QR code</span>
-            <span className="rounded-lg border border-border px-3 py-1.5 text-sm">Stats</span>
-          </div>
+        </section>
+      </main>
+
+      <footer className="border-t border-border">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-4 py-8 text-sm text-muted-foreground sm:px-6">
+          <Wordmark className="text-foreground" />
+          <nav aria-label="Footer" className="flex gap-5">
+            <Link href="/docs" className="hover:text-foreground">API docs</Link>
+            <a href="https://github.com/nandhu-44/SmolURL" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Source code</a>
+            <Link href="/signin" className="hover:text-foreground">Sign in</Link>
+          </nav>
         </div>
-      </section>
-
-      <section aria-labelledby="features" className="py-6">
-        <h2 id="features" className="heading mb-5 text-2xl">Everything a short link needs</h2>
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map(({ icon: Icon, title, text }) => (
-            <li key={title} className="surface p-5">
-              <Icon className="size-6 text-primary" />
-              <h3 className="heading mt-3 text-lg">{title}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{text}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <footer className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6 text-sm text-muted-foreground">
-        <span>SmolURL</span>
-        <nav className="flex gap-4">
-          <Link href="/docs" className="hover:text-foreground">API docs</Link>
-          <a href="https://github.com/nandhu-44/SmolURL" className="flex items-center gap-1 hover:text-foreground" target="_blank" rel="noopener noreferrer"><Code className="size-4" /> Source</a>
-        </nav>
       </footer>
-    </main>
+    </>
   );
 }

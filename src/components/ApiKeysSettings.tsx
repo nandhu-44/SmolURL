@@ -98,7 +98,7 @@ export default function ApiKeysSettings() {
             </>
           }
         >
-          <p className="heading text-lg">&ldquo;{deleting?.name}&rdquo; stops working immediately.</p>
+          <p className="text-sm text-muted-foreground">&ldquo;{deleting?.name}&rdquo; stops working immediately. Scripts using it will get 401 errors.</p>
           <p className="mt-1 text-sm text-muted-foreground">Anything still using it will start getting 401 errors. This can&apos;t be undone.</p>
         </AlertDialogContent>
       </AlertDialog>
@@ -114,14 +114,14 @@ function KeyRow({ k, onDelete }: { k: KeyInfo; onDelete: () => void }) {
     <div className={cn("rounded-xl border border-border p-4", expired && "opacity-70")}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="heading truncate text-base">{k.name} {expired && <span className="ml-1 rounded bg-destructive/15 px-1.5 py-0.5 text-[11px] text-destructive">expired</span>}</p>
+          <p className="truncate text-sm font-medium">{k.name} {expired && <span className="ml-1 rounded-[4px] bg-destructive/10 px-1.5 py-px text-xs text-destructive">Expired</span>}</p>
           <p className="mt-0.5 font-mono text-xs text-muted-foreground">{k.prefix}…</p>
         </div>
         <Button variant="ghost" size="icon-sm" aria-label={`Delete key ${k.name}`} onClick={onDelete} className="hover:bg-destructive/12 hover:text-destructive"><Trash2 className="!size-4" /></Button>
       </div>
       <div className="mt-2 flex flex-wrap gap-1.5">
-        {k.scopes.map((s) => <span key={s} className="rounded-full bg-primary/12 px-2 py-0.5 text-[11px] text-primary">{s === "links:read" ? "read" : "write"}</span>)}
-        <span className="text-[11px] text-muted-foreground">
+        {k.scopes.map((s) => <span key={s} className="rounded-[4px] bg-muted px-1.5 py-px text-xs text-muted-foreground">{s === "links:read" ? "Read" : "Write"}</span>)}
+        <span className="text-xs text-muted-foreground">
           Created {new Date(k.createdAt).toLocaleDateString()} · {k.lastUsedAt ? `last used ${timeAgo(k.lastUsedAt)}` : "never used"} · {k.expiresAt ? `${expired ? "expired" : "expires"} ${new Date(k.expiresAt).toLocaleDateString()}` : "no expiry"}
         </span>
       </div>
@@ -232,7 +232,7 @@ function SecretDialog({ secret, onClose }: { secret: string | null; onClose: () 
               {copied ? <Check /> : <Copy />}
             </Button>
           </div>
-          <pre className="overflow-x-auto rounded-xl border border-border bg-muted/50 p-3 font-mono text-[11px] leading-relaxed">{`curl ${typeof window !== "undefined" ? window.location.origin : ""}/api/v1/links \\\n  -H "Authorization: Bearer ${secret ?? ""}"`}</pre>
+          <pre className="mono overflow-x-auto rounded-md border border-border bg-muted p-3 text-xs leading-relaxed">{`curl ${typeof window !== "undefined" ? window.location.origin : ""}/api/v1/links \\\n  -H "Authorization: Bearer ${secret ?? ""}"`}</pre>
         </div>
       </DialogContent>
     </Dialog>

@@ -1,4 +1,3 @@
-import AppearanceSync from "@/components/AppearanceSync";
 import Landing from "@/components/Landing";
 import LinksApp from "@/components/LinksApp";
 import { getSessionUserId, toPublic } from "@/lib/auth";
@@ -17,7 +16,6 @@ export default async function Home() {
   const pub = toPublic(user);
   return (
     <>
-      <AppearanceSync appearance={pub.appearance} />
       <LinksApp user={pub} initial={data} />
     </>
   );

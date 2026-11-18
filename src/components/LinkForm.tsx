@@ -63,7 +63,7 @@ export default function LinkForm({ link, onClose, onSubmit }: { link: Link | nul
         onOpenAutoFocus={(e) => { e.preventDefault(); urlRef.current?.focus(); }}
         footer={
           <>
-            <Button variant="secondary" onClick={onClose}>Cancel</Button>
+            <Button variant="outline" onClick={onClose}>Cancel</Button>
             <Button onClick={() => submit()} disabled={saving || status === "invalid" || status === "taken" || !slug.trim()}>{saving ? "Saving…" : "Save changes"}</Button>
           </>
         }
@@ -82,16 +82,16 @@ export default function LinkForm({ link, onClose, onSubmit }: { link: Link | nul
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="edit-title">Title</Label>
-            <Input id="edit-title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} placeholder="Defaults to the site's name" />
+            <Input id="edit-title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} placeholder="The site's name" />
           </div>
           <div className="space-y-1.5">
             <Label>Expires</Label>
             <DatePicker value={expiry} onChange={setExpiry} placeholder="Never" clearLabel="Remove expiry" fromDate={new Date()} />
           </div>
-          <label htmlFor="edit-enabled" className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-border px-3.5 py-3">
+          <label htmlFor="edit-enabled" className="flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-border px-3 py-2.5">
             <span>
-              <span className="block text-sm font-medium">Link is on</span>
-              <span className="block text-xs text-muted-foreground">Turn off to pause redirects without deleting the link or its stats.</span>
+              <span className="block text-sm font-medium">Redirect visitors</span>
+              <span className="block text-xs text-muted-foreground">Turn off to pause the link. Its stats are kept.</span>
             </span>
             <Switch id="edit-enabled" checked={enabled} onCheckedChange={setEnabled} />
           </label>

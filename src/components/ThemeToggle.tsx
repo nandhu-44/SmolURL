@@ -35,7 +35,12 @@ const persist = (t: Theme) => {
   } catch {}
 };
 const prefersDark = () => window.matchMedia("(prefers-color-scheme: dark)").matches;
-const apply = (t: Theme) => document.documentElement.classList.toggle("dark", t === "dark" || (t === "system" && prefersDark()));
+const apply = (t: Theme) => {
+  const c = document.documentElement.classList;
+  c.toggle("dark", t === "dark" || (t === "system" && prefersDark()));
+  // "light" marks an explicit choice, so the CSS fallback for a dark system setting doesn't override it
+  c.toggle("light", t === "light");
+};
 
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("system");
@@ -84,22 +89,19 @@ export default function ThemeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" aria-label="Theme" title="Theme">
+        <Button variant="ghost" size="icon-sm" aria-label="Theme">
           {/* before mount we don't know the saved mode, so show a neutral icon to avoid a flash of the wrong one */}
-          {mounted ? <Current className="!size-5" /> : <Monitor className="!size-5" />}
+          {mounted ? <Current /> : <Monitor />}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="min-w-36">
         {OPTIONS.map(({ value, label, icon: Icon }) => (
           <DropdownMenuItem key={value} onSelect={() => choose(value)}>
             <Icon /> {label}
-            {value === "system" && mounted && <span className="text-xs text-muted-foreground">({osDark ? "dark" : "light"})</span>}
+            {value === "system" && mounted && <span className="text-xs text-muted-foreground">{osDark ? "Dark now" : "Light now"}</span>}
             {theme === value && <Check className="ml-auto text-primary" />}
           </DropdownMenuItem>
         ))}
-        <p className="max-w-44 px-3 pb-2 pt-1 text-[11px] leading-snug text-muted-foreground">
-          System follows your browser's light/dark setting (in Chrome: Settings → Appearance → Mode).
-        </p>
       </DropdownMenuContent>
     </DropdownMenu>
   );

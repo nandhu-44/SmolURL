@@ -50,8 +50,8 @@ export function OtpInput({ onComplete, disabled, autoFocus, resetKey }: { onComp
             refs.current[Math.min(text.length, 5)]?.focus();
           }}
           className={cn(
-            "heading size-11 rounded-xl border border-border bg-background/60 text-center text-xl outline-none transition sm:size-12",
-            "focus:border-primary focus:ring-4 focus:ring-primary/20 disabled:opacity-60",
+            "mono size-11 rounded-md border border-border bg-card text-center text-xl font-medium outline-none transition-[border-color,box-shadow] sm:size-12",
+            "focus:border-primary focus:shadow-[0_0_0_1px_hsl(var(--primary))] focus:outline-none disabled:opacity-60",
           )}
         />
       ))}

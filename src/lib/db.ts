@@ -18,8 +18,6 @@ export interface UserDoc {
   totpLastStep?: number;
   /** sha256 hashes of unused recovery codes */
   recoveryCodes?: string[];
-  /** font / colour theme / radius chosen in Settings (validated by parseAppearance) */
-  appearance?: unknown;
   createdAt: string;
 }
 /** `slugKey` is the lower-cased slug: short links are matched without regard to case, so "Docs" and "docs" can't both exist. */

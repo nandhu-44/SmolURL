@@ -7,7 +7,7 @@ import StatusPage from "@/components/StatusPage";
 import { clickSource, isBot, recordClick, resolveSlug } from "@/lib/links";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Link unavailable · SmolURL", robots: { index: false } };
+export const metadata: Metadata = { title: "Link unavailable", robots: { index: false } };
 
 /** /r/<slug>: sends the visitor on to the link's destination and counts the click. */
 export default async function ShortLink({ params }: { params: Promise<{ slug: string }> }) {
@@ -17,10 +17,10 @@ export default async function ShortLink({ params }: { params: Promise<{ slug: st
 
   const { link, state } = found;
   if (state === "disabled") {
-    return <StatusPage icon={PauseCircle} title="This link is turned off" message="Its owner has paused this short link. Try again later, or ask them for the address." />;
+    return <StatusPage icon={PauseCircle} title="This link is paused" message="Its owner has turned it off for now. Try again later, or ask them for the full address." />;
   }
   if (state === "expired") {
-    return <StatusPage icon={CalendarX2} title="This link has expired" message="The short link you followed was set to stop working after a certain date." />;
+    return <StatusPage icon={CalendarX2} title="This link has expired" message="Its owner set it to stop working after a certain date. Ask them for the full address." />;
   }
 
   const h = await headers();

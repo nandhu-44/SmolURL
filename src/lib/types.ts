@@ -1,5 +1,3 @@
-import type { Appearance } from "./appearance";
-
 export interface Link {
   id: string;
   /** the part after /r/, as the owner typed it */
@@ -36,5 +34,4 @@ export interface PublicUser {
   google: boolean;
   totpEnabled: boolean;
   recoveryLeft: number;
-  appearance: Appearance;
 }

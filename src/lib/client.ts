@@ -60,3 +60,17 @@ export async function copyText(text: string): Promise<boolean> {
 
 /** "2026-11-18" -> "18 Nov" (UTC day keys, shown as calendar dates). */
 export const shortDay = (day: string) => new Date(`${day}T00:00:00Z`).toLocaleDateString(undefined, { day: "numeric", month: "short", timeZone: "UTC" });
+
+const pluralRules = new Intl.PluralRules("en-US");
+/** "1 click", "3 clicks" (numbers formatted the same on server and browser). */
+export const plural = (n: number, one: string, other = `${one}s`) => `${n.toLocaleString("en-US")} ${pluralRules.select(n) === "one" ? one : other}`;
+
+/** Relative time for the last week, then an absolute date ("12 Mar"). Only call after mount: it reads the clock. */
+export function when(iso: string, now: number): string {
+  const s = Math.max(0, (now - Date.parse(iso)) / 1000);
+  if (s < 45) return "just now";
+  if (s < 3600) return `${Math.round(s / 60)} min ago`;
+  if (s < 86400) return `${Math.round(s / 3600)} h ago`;
+  if (s < 7 * 86400) return `${Math.round(s / 86400)} d ago`;
+  return new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short", year: new Date(iso).getFullYear() === new Date(now).getFullYear() ? undefined : "numeric" });
+}

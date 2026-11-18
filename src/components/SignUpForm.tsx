@@ -35,7 +35,7 @@ export default function SignUpForm({ googleEnabled, captcha }: { googleEnabled: 
   }
 
   return (
-    <AuthShell title="Create your account" subtitle="Takes less than a minute">
+    <AuthShell title="Create your account" subtitle="Choose names for your links and track every click.">
       <form onSubmit={onSubmit} className="space-y-4">
         <Field label="Name" icon={User} name="name" placeholder="John Doe" autoComplete="name" required maxLength={60} />
         <Field label="Email" icon={Mail} name="email" type="email" placeholder="john.doe@example.com" autoComplete="email" required />

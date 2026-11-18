@@ -32,17 +32,17 @@ export default function QrDialog({ link, shortUrl, onClose }: { link: Link | nul
         className="max-w-sm"
         footer={
           <>
-            <Button asChild variant="secondary" disabled={!svg}><a href={svgHref} download={`${file}.svg`}><Download /> SVG</a></Button>
+            <Button asChild variant="outline" disabled={!svg}><a href={svgHref} download={`${file}.svg`}><Download /> SVG</a></Button>
             <Button asChild disabled={!png}><a href={png} download={`${file}.png`}><Download /> PNG</a></Button>
           </>
         }
       >
-        <div className="mx-auto aspect-square w-full max-w-64 overflow-hidden rounded-xl border border-border bg-white">
+        <div className="mx-auto aspect-square w-full max-w-60 overflow-hidden rounded-lg border border-border bg-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {png ? <img src={png} alt={`QR code that opens ${shortUrl}`} className="size-full" /> : <div className="size-full animate-soft-pulse bg-muted" />}
         </div>
-        <p className="mt-3 break-all text-center font-mono text-sm">{shortUrl.replace(/^https?:\/\//, "")}</p>
-        <p className="mt-1 text-center text-xs text-muted-foreground">Scanning it counts as a click, like opening the link.</p>
+        <p className="mono mt-3 break-all text-center text-sm font-medium">{shortUrl.replace(/^https?:\/\//, "")}</p>
+        <p className="mt-1 text-center text-xs text-muted-foreground">Each scan counts as a click.</p>
       </DialogContent>
     </Dialog>
   );

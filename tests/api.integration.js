@@ -67,7 +67,7 @@ const api = async (key, path, opts = {}) => { const r = await fetch(B+'/api/v1'+
   ok('unknown slug -> 404 page', (await fetch(B+'/r/nope-nope', { redirect:'manual', headers: UA })).status === 404);
 
   const p1 = await api(KEY,'/links/'+id1,{method:'PATCH',body:JSON.stringify({enabled:false})}); ok('pause', p1.status === 200 && p1.body.data.enabled === false);
-  const off = await fetch(B+'/r/Launch', { redirect:'manual', headers: UA }); ok('paused link shows a page instead of redirecting', off.status === 200 && (await off.text()).includes('turned off'));
+  const off = await fetch(B+'/r/Launch', { redirect:'manual', headers: UA }); ok('paused link shows a page instead of redirecting', off.status === 200 && (await off.text()).includes('This link is paused'));
   const p2 = await api(KEY,'/links/'+id1,{method:'PATCH',body:JSON.stringify({enabled:true,slug:'spring'})}); ok('rename slug + turn on', p2.status === 200 && p2.body.data.slug === 'spring');
   ok('old slug is free / 404 now, new one redirects', (await fetch(B+'/r/Launch',{redirect:'manual',headers:UA})).status === 404 && (await fetch(B+'/r/spring',{redirect:'manual',headers:UA})).status === 307);
 

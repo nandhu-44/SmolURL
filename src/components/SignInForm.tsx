@@ -60,7 +60,7 @@ export default function SignInForm({ googleEnabled, captcha, initialError }: { g
   }
 
   return (
-    <AuthShell title="Welcome back" subtitle="Sign in to manage your links">
+    <AuthShell title="Sign in" subtitle="Manage your short links and see who clicks them.">
       <form onSubmit={onSubmit} className="space-y-4">
         <Field label="Email" icon={Mail} name="email" type="email" placeholder="john.doe@example.com" autoComplete="email webauthn" required />
         <Field label="Password" icon={Lock} name="password" type="password" placeholder="Enter your password" autoComplete="current-password" required />
@@ -74,7 +74,7 @@ export default function SignInForm({ googleEnabled, captcha, initialError }: { g
         {(googleEnabled || canPasskey) && <OrDivider />}
         {canPasskey && (
           <Button type="button" variant="outline" size="lg" className="w-full" disabled={passkeyBusy} onClick={withPasskey}>
-            <Fingerprint className="!size-5" /> {passkeyBusy ? "Waiting for your device…" : "Sign in with a passkey"}
+            <Fingerprint /> {passkeyBusy ? "Waiting for your device…" : "Sign in with a passkey"}
           </Button>
         )}
         {googleEnabled && <GoogleButton />}

@@ -18,8 +18,8 @@ export function DatePicker({ value, onChange, placeholder = "No date", clearLabe
           <button
             type="button"
             className={cn(
-              "flex h-10 flex-1 items-center gap-2 rounded-xl border border-border bg-background/60 px-3.5 text-left text-sm outline-none transition focus-visible:ring-4 focus-visible:ring-primary/20 data-[state=open]:border-primary",
-              !selected && "text-muted-foreground/70",
+              "flex h-9 flex-1 items-center gap-2 rounded-md border border-border bg-card px-3 text-left text-sm shadow-[0_1px_0_0_hsl(var(--border)/0.6)] transition-[border-color] duration-150 data-[state=open]:border-primary [&_svg]:text-muted-foreground",
+              !selected && "text-muted-foreground",
             )}
           >
             <CalendarDays className="size-4" />
@@ -27,7 +27,7 @@ export function DatePicker({ value, onChange, placeholder = "No date", clearLabe
           </button>
         </Popover.Trigger>
         {selected && (
-          <button type="button" onClick={() => onChange("")} aria-label={clearLabel} className="grid size-10 place-items-center rounded-xl text-muted-foreground hover:bg-muted">
+          <button type="button" onClick={() => onChange("")} aria-label={clearLabel} className="grid size-9 place-items-center rounded-md text-muted-foreground hover:bg-muted">
             <X className="size-4" />
           </button>
         )}
@@ -36,7 +36,7 @@ export function DatePicker({ value, onChange, placeholder = "No date", clearLabe
         <Popover.Content
           align="start"
           sideOffset={6}
-          className="z-[70] rounded-2xl border border-border bg-popover p-3 shadow-xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
+          className="z-[70] origin-[var(--radix-popover-content-transform-origin)] rounded-lg border border-border bg-popover p-2 shadow-[0_10px_30px_-10px_rgb(15_20_30/0.25),0_2px_6px_-2px_rgb(15_20_30/0.08)] duration-150 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-[0.97]"
         >
           <DayPicker
             mode="single"
