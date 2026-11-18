@@ -1,0 +1,47 @@
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  darkMode: "class",
+  content: ["./src/**/*.{ts,tsx}"],
+  theme: {
+    extend: {
+      // corner radius follows the user's setting (--radius, default 12px)
+      borderRadius: {
+        md: "max(0px, calc(var(--radius) - 6px))",
+        lg: "max(0px, calc(var(--radius) - 2px))",
+        xl: "var(--radius)",
+        "2xl": "calc(var(--radius) * 1.333)",
+      },
+      colors: {
+        background: "hsl(var(--background) / <alpha-value>)",
+        foreground: "hsl(var(--foreground) / <alpha-value>)",
+        card: "hsl(var(--card) / <alpha-value>)",
+        popover: "hsl(var(--popover) / <alpha-value>)",
+        muted: { DEFAULT: "hsl(var(--muted) / <alpha-value>)", foreground: "hsl(var(--muted-foreground) / <alpha-value>)" },
+        border: "hsl(var(--border) / <alpha-value>)",
+        primary: { DEFAULT: "hsl(var(--primary) / <alpha-value>)", foreground: "hsl(var(--primary-foreground) / <alpha-value>)" },
+        destructive: { DEFAULT: "hsl(var(--destructive) / <alpha-value>)", foreground: "hsl(0 0% 100%)" },
+        prio: { high: "hsl(var(--p-high) / <alpha-value>)", medium: "hsl(var(--p-medium) / <alpha-value>)", low: "hsl(var(--p-low) / <alpha-value>)" },
+      },
+      fontFamily: {
+        supercell: ["var(--font-heading)"],
+        poppins: ["var(--font-body)"],
+      },
+      keyframes: {
+        float: {
+          "0%,100%": { transform: "translate3d(0,0,0) scale(1)" },
+          "50%": { transform: "translate3d(40px,-50px,0) scale(1.12)" },
+        },
+        "nav-progress": { "0%": { transform: "translateX(-100%)" }, "100%": { transform: "translateX(300%)" } },
+        "soft-pulse": { "0%,100%": { opacity: "1" }, "50%": { opacity: "0.7" } },
+      },
+      animation: {
+        float: "float 18s ease-in-out infinite",
+        "float-slow": "float 26s ease-in-out infinite reverse",
+        "soft-pulse": "soft-pulse 4s ease-in-out infinite",
+      },
+    },
+  },
+  plugins: [require("tailwindcss-animate")],
+};
+export default config;
